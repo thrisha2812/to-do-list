@@ -161,3 +161,24 @@ body
 
 }
 
+.task-button
+{
+    display:flex;
+    gap:10px;
+    margin-right: auto;
+}
+
+.task-buttons button{
+    background:#c76a0d;
+    border:none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    color: #fff;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
