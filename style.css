@@ -161,6 +161,11 @@ body
 
 }
 
+#task-list li.completed span
+{
+    text-decoration:2px line-through black ;
+    color: black;
+}
 .task-buttons
 {
     display:flex;
