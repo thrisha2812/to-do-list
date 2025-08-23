@@ -161,7 +161,7 @@ body
 
 }
 
-.task-button
+.task-buttons
 {
     display:flex;
     gap:10px;
@@ -181,4 +181,18 @@ body
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.task-button button:hover{
+    transform: scale(1.2);
+}
+
+.task-buttons .edit-btn
+{
+    background: #de7fb0;
+}
+
+.task-buttons .delete-btn
+{
+    background:#c76a0d ;
 }
