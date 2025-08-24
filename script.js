@@ -8,18 +8,62 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.getElementById('progress');
     const progressNumbers = document.getElementById('numbers');
 
+    const runConfetti = () => {
+        const count = 200,
+            defaults = {
+                origin: { y: 0.7 },
+            };
+
+        function fire(particleRatio, opts) {
+            confetti(
+                Object.assign({}, defaults, opts, {
+                    particleCount: Math.floor(count * particleRatio),
+                })
+            );
+        }
+
+        fire(0.25, {
+            spread: 26,
+            startVelocity: 55,
+        });
+
+        fire(0.2, {
+            spread: 60,
+        });
+
+        fire(0.35, {
+            spread: 100,
+            decay: 0.91,
+            scalar: 0.8,
+        });
+
+        fire(0.1, {
+            spread: 120,
+            startVelocity: 25,
+            decay: 0.92,
+            scalar: 1.2,
+        });
+
+        fire(0.1, {
+            spread: 120,
+            startVelocity: 45,
+        });
+    };
+
     const updateProgress = () => {
         const totalTasks = taskList.children.length;
         const completedTasks = taskList.querySelectorAll('.checkbox:checked').length;
         
-        // Corrected spelling of 'completedTasks'
         progressBar.style.width = totalTasks ? `${(completedTasks / totalTasks) * 100}%` : '0%';
         progressNumbers.textContent = `${completedTasks}/${totalTasks}`;
+        
+        // Trigger confetti when all tasks are complete
+        if (totalTasks > 0 && completedTasks === totalTasks) {
+            runConfetti();
+        }
     };
 
-    // Function to add a new task
     const addTask = (event, text, completed = false) => {
-        // Prevent form submission if an event is passed
         if (event) {
             event.preventDefault();
         }
@@ -33,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const li = document.createElement('li');
 
         li.innerHTML = `
-            <input type="checkbox" class="checkbox" ${completed ? 'checked' : ' '}/>
+            <input type="checkbox" class="checkbox" ${completed ? 'checked' : ''}/>
             <span>${taskText}</span>
             <div class="task-buttons">
                 <button class="edit-btn"><i class="fa-solid fa-pen"></i></button>
@@ -56,25 +100,25 @@ document.addEventListener('DOMContentLoaded', () => {
             editBtn.disabled = isChecked;
             editBtn.style.opacity = isChecked ? '0.5' : '1';
             editBtn.style.pointerEvents = isChecked ? 'none' : 'auto';
-            updateProgress(); // Call updateProgress after state change
+            updateProgress();
         });
 
         editBtn.addEventListener('click', () => {
             if (!checkbox.checked) {
                 taskInput.value = li.querySelector('span').textContent;
                 li.remove();
-                updateProgress(); // Call updateProgress after task removal
+                updateProgress();
             }
         });
 
         li.querySelector('.delete-btn').addEventListener('click', () => {
             li.remove();
-            updateProgress(); // Call updateProgress after task removal
+            updateProgress();
         });
 
         taskList.appendChild(li);
         taskInput.value = '';
-        updateProgress(); // Call updateProgress after adding a new task
+        updateProgress();
     };
 
     addTaskBtn.addEventListener('click', (event) => addTask(event));
@@ -85,6 +129,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // You may want to call updateProgress once on load to initialize it
     updateProgress();
 });
