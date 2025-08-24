@@ -54,7 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalTasks = taskList.children.length;
         const completedTasks = taskList.querySelectorAll('.checkbox:checked').length;
         
-        progressBar.style.width = totalTasks ? `${(completedTasks / totalTasks) * 100}%` : '0%';
+        let percentage = 0;
+        if (totalTasks > 0) {
+            percentage = (completedTasks / totalTasks) * 100;
+        }
+
+        progressBar.style.width = `${percentage}%`;
         progressNumbers.textContent = `${completedTasks}/${totalTasks}`;
         
         // Trigger confetti when all tasks are complete
@@ -62,20 +67,25 @@ document.addEventListener('DOMContentLoaded', () => {
             runConfetti();
         }
     };
-    const saveTaskToLocalStorage=()=>{
-        const tasks=Array.from(taskList.querySelectorAll('li')).map(li=>({
-            text:li.querySelector('span').textContent,
-            completed:li.querySelector('.checkbox').checked
+    
+    const saveTaskToLocalStorage = () => {
+        const tasks = Array.from(taskList.querySelectorAll('li')).map(li => ({
+            text: li.querySelector('span').textContent,
+            completed: li.querySelector('.checkbox').checked
         }));
-        localStorage.setItem('tasks',JSON.stringify(tasks));
+        localStorage.setItem('tasks', JSON.stringify(tasks));
     };
 
-    const loadTaskFromLocalStorage=()=>{
-        const savedTasks= JSON.parse(localStorage.getItem('tasks'))||[];
-        savedTasks.forEach(({text,completed})=>addTask(text,completed,false));
+    const loadTaskFromLocalStorage = () => {
+        const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        
+        // Only iterate and add if tasks exist
+        if (savedTasks.length > 0) {
+            savedTasks.forEach(({ text, completed }) => addTask(null, text, completed));
+        }
+        
         updateProgress();
-    }
-
+    };
 
     const addTask = (event, text, completed = false) => {
         if (event) {
@@ -136,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         taskList.appendChild(li);
         taskInput.value = '';
         updateProgress();
+        saveTaskToLocalStorage();
     };
 
     addTaskBtn.addEventListener('click', (event) => addTask(event));
@@ -145,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
             addTask(e);
         }
     });
+    
     loadTaskFromLocalStorage();
-
-    updateProgress();
 });
