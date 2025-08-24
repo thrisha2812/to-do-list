@@ -62,6 +62,20 @@ document.addEventListener('DOMContentLoaded', () => {
             runConfetti();
         }
     };
+    const saveTaskToLocalStorage=()=>{
+        const tasks=Array.from(taskList.querySelectorAll('li')).map(li=>({
+            text:li.querySelector('span').textContent,
+            completed:li.querySelector('.checkbox').checked
+        }));
+        localStorage.setItem('tasks',JSON.stringify(tasks));
+    };
+
+    const loadTaskFromLocalStorage=()=>{
+        const savedTasks= JSON.parse(localStorage.getItem('tasks'))||[];
+        savedTasks.forEach(({text,completed})=>addTask(text,completed,false));
+        updateProgress();
+    }
+
 
     const addTask = (event, text, completed = false) => {
         if (event) {
@@ -101,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             editBtn.style.opacity = isChecked ? '0.5' : '1';
             editBtn.style.pointerEvents = isChecked ? 'none' : 'auto';
             updateProgress();
+            saveTaskToLocalStorage();
         });
 
         editBtn.addEventListener('click', () => {
@@ -108,12 +123,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 taskInput.value = li.querySelector('span').textContent;
                 li.remove();
                 updateProgress();
+                saveTaskToLocalStorage();
             }
         });
 
         li.querySelector('.delete-btn').addEventListener('click', () => {
             li.remove();
             updateProgress();
+            saveTaskToLocalStorage();
         });
 
         taskList.appendChild(li);
@@ -128,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addTask(e);
         }
     });
+    loadTaskFromLocalStorage();
 
     updateProgress();
 });
