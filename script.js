@@ -5,26 +5,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const addTaskBtn = document.getElementById('add-task-btn');
     // Select the list where tasks will be displayed
     const taskList = document.getElementById('task-list');
+    const progressBar = document.getElementById('progress');
+    const progressNumbers = document.getElementById('numbers');
+
+    const updateProgress = () => {
+        const totalTasks = taskList.children.length;
+        const completedTasks = taskList.querySelectorAll('.checkbox:checked').length;
+        
+        // Corrected spelling of 'completedTasks'
+        progressBar.style.width = totalTasks ? `${(completedTasks / totalTasks) * 100}%` : '0%';
+        progressNumbers.textContent = `${completedTasks}/${totalTasks}`;
+    };
 
     // Function to add a new task
     const addTask = (event, text, completed = false) => {
-        // Prevent the default form submission behavior (if an event is passed)
+        // Prevent form submission if an event is passed
         if (event) {
             event.preventDefault();
         }
-
-        // Get the trimmed value from the input field
+        
         const taskText = text || taskInput.value.trim();
 
-        // If the input is empty, do nothing
         if (!taskText) {
             return;
         }
 
-        // Create a new list item element
         const li = document.createElement('li');
 
-        // Set the inner HTML for the list item
         li.innerHTML = `
             <input type="checkbox" class="checkbox" ${completed ? 'checked' : ' '}/>
             <span>${taskText}</span>
@@ -36,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const checkbox = li.querySelector('.checkbox');
         const editBtn = li.querySelector('.edit-btn');
         
-        // Apply completed styles on initial creation
         if (completed) {
             li.classList.add('completed');
             editBtn.disabled = true;
@@ -44,41 +50,41 @@ document.addEventListener('DOMContentLoaded', () => {
             editBtn.style.pointerEvents = 'none';
         }
 
-        // This part is the correct logic for handling completed tasks
         checkbox.addEventListener('change', () => {
             const isChecked = checkbox.checked;
             li.classList.toggle('completed', isChecked);
             editBtn.disabled = isChecked;
             editBtn.style.opacity = isChecked ? '0.5' : '1';
             editBtn.style.pointerEvents = isChecked ? 'none' : 'auto';
+            updateProgress(); // Call updateProgress after state change
         });
 
         editBtn.addEventListener('click', () => {
             if (!checkbox.checked) {
                 taskInput.value = li.querySelector('span').textContent;
                 li.remove();
+                updateProgress(); // Call updateProgress after task removal
             }
         });
 
         li.querySelector('.delete-btn').addEventListener('click', () => {
             li.remove();
+            updateProgress(); // Call updateProgress after task removal
         });
 
-        // Append the new list item to the task list
         taskList.appendChild(li);
-
-        // Clear the input field for the next task
         taskInput.value = '';
+        updateProgress(); // Call updateProgress after adding a new task
     };
 
-    // Correctly add a click event listener to the "add task" button
     addTaskBtn.addEventListener('click', (event) => addTask(event));
 
-    // Correctly add a keypress event listener to the input field itself
     taskInput.addEventListener('keypress', (e) => {
-        // Check if the pressed key is 'Enter'
         if (e.key === 'Enter') {
             addTask(e);
         }
     });
+
+    // You may want to call updateProgress once on load to initialize it
+    updateProgress();
 });
